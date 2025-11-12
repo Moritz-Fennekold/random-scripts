@@ -1,16 +1,16 @@
 param(
     [string[]]$Paths = @(
-        '\\...\',
+        '\\...\',             # Hier die Ordnerpfade angeben, welche gescanned werden sollen
         '\\...\...'
     ),
-    [string]$TxtLog = '\\Pfad\zum\Logs-Ordner'
+    [string]$TxtLog = '\\Pfad\zum\Logs-Ordner'        # Pfad für die .txt Datei
 )
 
 Add-Type -AssemblyName System.IO
 
 # Datum für CSV im Dateinamen
 $scanDate = Get-Date -Format "yyyy-MM-dd"
-$CsvLog = "\\...\folder_scan_$scanDate.csv"
+$CsvLog = "\\...\folder_scan_$scanDate.csv"           # Ofad für die .csv Datei
 
 # Liste für CSV-Ergebnisse
 $csvResults = New-Object System.Collections.Generic.List[PSObject]
@@ -104,3 +104,4 @@ $csvResults | Export-Csv -Path $CsvLog -Delimiter ";" -Encoding UTF8 -NoTypeInfo
 # Abschlussmeldung
 "`nScan beendet am $(Get-Date -Format "yyyy-MM-dd HH:mm:ss") " | Out-File -FilePath $TxtLog -Append -Encoding UTF8
 Write-Host "`nFertig! Ergebnisse wurden gespeichert in:`nTXT: $TxtLog`nCSV: $CsvLog"
+
