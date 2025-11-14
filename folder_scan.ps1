@@ -1,16 +1,46 @@
+<#
+.SYNOPSIS
+    Scannt beliebige Verzeichnisse rekursiv und ermittelt die Anzahl von Dateien, Ordnern, Gesamtgröße sowie aufgetretene Fehler. 
+    Ergebnisse werden als .txt und .csv gespeichert.
+
+.DESCRIPTION
+    Das Skript dient zur Analyse vom Speicherverbrauch in Fileserver-Strukturen.
+    Es ermittelt rekursiv die Größe und Struktur des Hauptordners und aller Unterordner der ersten Ebene.
+    Die Ergebnisse werden dann als CSV (für weitere Auswertung bspw. via folder_scan_comparison.py) und als lesbare TXT-Logdatei gespeichert, wobei die TXT-Logdatei bei jeder Ausführung überschrieben wird.
+    Fehler beim Zugriff auf Dateien oder Ordner werden mitgezählt.
+
+.AUTHOR
+    Moritz
+
+.VERSION
+    1.0 I guess - 14.11.2025 Initial Version
+
+.PARAMETER
+    Paths:     Liste der Ordnerpfade, die gescannt werden sollen (da ich das Skript für Fileserver-Strukturen benutze, gebe ich die Pfade in UNC-Format an).
+    TxtLog:    Pfad zur TXT-Logdatei, in welche fortlaufend geschrieben wird.
+
+.OUTPUT
+    CSV-Datei mit Scanergebnissen (z.B. folder_scan_2025-11-14.csv)
+    TXT-Log mit allen Terminal-Ausgaben
+
+.NOTES
+    Zum Ausführen benutze ich VSCode mit der PowerShell Extension (v2025.4.0), oder direkt per PowerShell (Version 7.5.4 in Win11 25H2).
+    Fehler beim Dateizugriff werden lediglich gezählt, nicht einzeln protokolliert.
+    Die CSV-Datei wird automatisch mit Tagesdatum versehen.
+#>
 param(
     [string[]]$Paths = @(
-        '\\...\',             # Hier die Ordnerpfade angeben, welche gescanned werden sollen
+        '\\...\',
         '\\...\...'
     ),
-    [string]$TxtLog = '\\Pfad\zum\Logs-Ordner'        # Pfad für die .txt Datei
+    [string]$TxtLog = '\\...\folder_scan_today.txt'
 )
 
 Add-Type -AssemblyName System.IO
 
 # Datum für CSV im Dateinamen
 $scanDate = Get-Date -Format "yyyy-MM-dd"
-$CsvLog = "\\...\folder_scan_$scanDate.csv"           # Pfad für die .csv Datei
+$CsvLog = "\\...\folder_scan_$scanDate.csv"
 
 # Liste für CSV-Ergebnisse
 $csvResults = New-Object System.Collections.Generic.List[PSObject]
@@ -104,5 +134,3 @@ $csvResults | Export-Csv -Path $CsvLog -Delimiter ";" -Encoding UTF8 -NoTypeInfo
 # Abschlussmeldung
 "`nScan beendet am $(Get-Date -Format "yyyy-MM-dd HH:mm:ss") " | Out-File -FilePath $TxtLog -Append -Encoding UTF8
 Write-Host "`nFertig! Ergebnisse wurden gespeichert in:`nTXT: $TxtLog`nCSV: $CsvLog"
-
-
